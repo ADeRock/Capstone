@@ -1,3 +1,0 @@
-"# Capstone" 
-"# Capstone" 
-"# Capstone" 
