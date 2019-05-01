@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+    <head style="font-family:courier;" style="font-size:75%;"> 
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+        <script src="http://cdnjs.cloudflare.com/ajax/libs/mathjs/0.15.0/math.min.js"></script>  
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.2/jquery.min.js"></script>     
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    </head> 
+
+    <body>
+        <form>
+                <div class="container-fluid">
+                    <p style="text-align:center;">
+                    <div class="jumbotron" style = background-color:dimgrey>
+                        <h1 style="text-align:center; color:ghostwhite;" class=display-4>Graphing Calculator</h1>
+                    </div>
+                    </p>
+            </div>
+        </form>
+
+        <form>  
+            <div>
+                <input id="inputField" class="form-control" style="text-align:center;">
+            </div>
+            <br></br>
+            <div style="text-align:center;">
+            <canvas id="myCanvas" width="800" height="800" style="border:1px solid #000000;"></canvas>
+            <script>
+                var canvas = document.getElementById('myCanvas'),
+                ctx = canvas.getContext('2d');
+                //ctx.moveTo(400, 0);
+                //ctx.lineTo(400, 800);
+                //ctx.moveTo(0, 400);
+                //ctx.lineTo(800, 400);
+                //ctx.stroke()=2;
+
+                var n = 100,
+                xMin = -10,
+                xMax = 10,
+                yMin = -10,
+                yMax = 10,
+                math = mathjs(),
+                expr = '',
+                scope = {x: 0, t:0},
+                tree = math.parse(expr, scope),
+                time = 0,
+                timeIncrement = 0.1;
+
+            drawCurve();
+            inItTextField();
+            startAnimation();
+
+            function drawCurve () {
+                var i, x, y, percentX, percentY, mathX, mathY;
+
+                ctx.clearRect(0,0,canvas.width,canvas.height);
+
+                ctx.beginPath();
+                for (i = 0; i < n; i++) {
+                    percentX = i/(n-1);
+                    mathX = percentX * (xMax- xMin) + xMin;
+
+                    mathY = evaluateMathExpr(mathX);
+                    
+                    percentY = (mathY - yMin) / (yMax- yMin);
+                    percentY = 1 - percentY;
+
+                    x = percentX * canvas.width;
+                    y = percentY * canvas.height;
+                    ctx.lineTo(x, y);
+                }
+                ctx.stroke();
+            }
+
+            function evaluateMathExpr(mathX) {
+                scope.x =mathX;
+                scope.t = time;
+                return tree.eval();
+            }
+
+            function inItTextField() {
+                var input = $('#inputField');
+                input.val(expr);
+      
+                input.keyup(function (event) {
+                    expr = input.val();
+                    tree = math.parse(expr, scope)
+                    drawCurve();
+                });
+            }
+
+            function startAnimation() {
+                (function animloop(){
+                    requestAnimationFrame(animloop);
+                    render();
+                }());
+            }
+
+            function render(){
+                    time = time + timeIncrement;
+                    drawCurve();
+                }
+            </script>
+            </div>
+        </form>
+    </body> 
+</html>
